@@ -14,7 +14,6 @@ def make_everything(unit):
     cursor.execute(global_query)
     records = cursor.fetchall()
     unit,name,url,boundary_coords,lat,long,head,flyto_range,tilt = records[0]
-    print(f'{unit} {name} {lat} {long}')
     print('---------------------------------')
     print(f'Starting build of files for {unit}')
     # run all three build functions
@@ -24,7 +23,7 @@ def make_everything(unit):
 def make_boundary(unit,name,boundary_coords):
     boundary_outfile = (f'nps-{unit}-boundary.kml')
     boundary_outfile = os.path.join(boundaries,boundary_outfile)
-    print(f'Creating boundary kml file for {unit} at {boundary_outfile}')
+    print(f'Creating boundary kml file for {unit}')
     xml = open(boundary_outfile, 'w')
     xml.write('<?xml version="1.0" encoding="UTF-8"?>\n')
     xml.write(f'<!-- Generated {now} by make-unit.py -->\n')
@@ -78,7 +77,7 @@ def make_boundary(unit,name,boundary_coords):
 def make_flyto(unit,name,lat,long,head,flyto_range,tilt):
     flyto_outfile = (f'nps-{unit}-flyto.kml')
     flyto_outfile = os.path.join(flytos,flyto_outfile)
-    print(f'Creating flyto kml file for {unit} at {flyto_outfile}')
+    print(f'Creating flyto kml file for {unit}')
     xml = open(flyto_outfile, 'w')
     xml.write('<?xml version="1.0" encoding="UTF-8"?>\n')
     xml.write(f'<!-- Generated {now} by make-unit.py -->\n')
