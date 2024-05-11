@@ -1,3 +1,4 @@
 __pycache__
 .DS_Store
 nps_db_connect.json
+kml/*/*
