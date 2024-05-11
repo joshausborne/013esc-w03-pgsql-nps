@@ -13,6 +13,7 @@ kml_dir = os.path.join(base_dir,'kml/')
 boundaries = os.path.join(kml_dir,'boundaries/')
 flytos = os.path.join(kml_dir,'flytos/')
 placemarks = os.path.join(kml_dir,'placemarks/')
+placemark_img = 'https://raw.githubusercontent.com/joshausborne/013esc-w03-pgsql-nps/main/images/placemark-star.png'
 
 
 # Import DB connection credentials from nps_db_connect.json
