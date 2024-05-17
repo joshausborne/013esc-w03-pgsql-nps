@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated {{ now }} by make-unit.py -->
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>{{ name }}</name>
+    <StyleMap id="msn_nps-{{ unit }}-placemark">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#sn_nps-{{ unit }}-placemark</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#sh_nps-{{ unit }}-placemark</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="sh_nps-{{ unit }}-placemark">
+      <IconStyle>
+        <scale>1.5</scale>
+        <Icon>
+          <href>{{ placemark_img }}</href>
+        </Icon>
+        <hotSpot x="0.5" y="0.5" xunits="fraction" yunits="fraction"/>
+      </IconStyle>
+      <LabelStyle>
+        <color>00ffffff</color>
+      </LabelStyle>
+      <ListStyle>
+      </ListStyle>
+    </Style>
+    <Style id="sn_nps-{{ unit }}-placemark">
+      <IconStyle>
+        <scale>2.5</scale>
+        <Icon>
+          <href>{{ placemark_img }}</href>
+        </Icon>
+        <hotSpot x="0.5" y="0.5" xunits="fraction" yunits="fraction"/>
+      </IconStyle>
+      <LabelStyle>
+        <color>00ffffff</color>
+      </LabelStyle>
+      <ListStyle>
+      </ListStyle>
+    </Style>
+    <Placemark>
+      <name>{{ name }}</name>
+      <LookAt>
+        <latitude>{{ lat }}</latitude>
+        <longitude>{{ long }}</longitude>
+        <altitude>0</altitude>
+        <heading>{{ head }}</heading>
+        <range>{{ flyto_range }}</range>
+        <tilt>{{ tilt }}</tilt>
+        <gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+      </LookAt>
+      <styleUrl>#msn_nps-{{ unit }}-placemark</styleUrl>
+      <Point>
+        <extrude>1</extrude>
+        <altitudeMode>relativeToGround</altitudeMode>
+        <gx:drawOrder>1</gx:drawOrder>
+        <coordinates>-112.961166,37.238655,250</coordinates>
+      </Point>
+    </Placemark>
+    <NetworkLink>
+      <name>Autoplay</name>
+      <Link>
+        <href>http://localhost:8765/query.html?query=playtour=5c78ee78-98ec-40e5-8dbc-5af90d435bc8</href>
+      </Link>
+    </NetworkLink>
+    <Tour xmlns="http://www.google.com/kml/ext/2.2">
+      <name xmlns="http://www.opengis.net/kml/2.2">5c78ee78-98ec-40e5-8dbc-5af90d435bc8</name>
+      <Playlist>
+        <FlyTo>
+          <duration>14.0</duration>
+          <flyToMode></flyToMode>
+          <LookAt xmlns="http://www.opengis.net/kml/2.2">
+            <latitude>{{ lat }}</latitude>
+            <longitude>{{ long }}</longitude>
+            <altitude>0</altitude>
+            <heading>{{ head }}</heading>
+            <range>{{ flyto_range }}</range>
+            <tilt>{{ tilt }}</tilt>
+          </LookAt>
+        </FlyTo>
+      </Playlist>
+    </Tour>
+  </Document>
+</kml>
