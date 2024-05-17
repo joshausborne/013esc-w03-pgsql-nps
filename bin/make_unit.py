@@ -3,9 +3,12 @@
 import sys, os
 from datetime import datetime
 from config import *
+from jinja2 import Environment, FileSystemLoader
 
 now = datetime.now()
 unit = sys.argv[1]
+
+env = Environment(loader=FileSystemLoader(templates))
 
 def make_everything(unit):
     global_query = (('SELECT id, name, url, boundary_coords, flyto_lat, flyto_long, flyto_heading, '
@@ -16,159 +19,45 @@ def make_everything(unit):
     unit,name,url,boundary_coords,lat,long,head,flyto_range,tilt = records[0]
     print('---------------------------------')
     print(f'Starting build of files for {unit}')
-    # run all three build functions
-    make_boundary(unit,name,boundary_coords)
-    make_flyto(unit,name,lat,long,head,flyto_range,tilt)
+    # run all build functions
+    make_boundary(unit,name,boundary_coords,now,placemark_img)
+    make_flyto(unit,name,lat,long,head,flyto_range,tilt,now,placemark_img)
 
-def make_boundary(unit,name,boundary_coords):
+def make_boundary(unit,name,boundary_coords,now,placemark_img):
+    template = env.get_template('nps-boundary-template.kml')
     boundary_outfile = (f'nps-{unit}-boundary.kml')
     boundary_outfile = os.path.join(boundaries,boundary_outfile)
     print(f'Creating boundary kml file for {unit}')
-    xml = open(boundary_outfile, 'w')
-    xml.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-    xml.write(f'<!-- Generated {now} by make-unit.py -->\n')
-    xml.write(('<kml xmlns="http://www.opengis.net/kml/2.2" '
-             'xmlns:gx="http://www.google.com/kml/ext/2.2" '
-             'xmlns:kml="http://www.opengis.net/kml/2.2" '
-             'xmlns:atom="http://www.w3.org/2005/Atom">\n'))
-    xml.write('<Document>\n')
-    xml.write(f'  <name>{name}</name>\n')
-    xml.write('    <StyleMap id="stylemap_id1">\n')
-    xml.write('      <Pair>\n')
-    xml.write('        <key>normal</key>\n')
-    xml.write('        <styleUrl>#style</styleUrl>\n')
-    xml.write('      </Pair>\n')
-    xml.write('      <Pair>\n')
-    xml.write('        <key>highlight</key>\n')
-    xml.write('        <styleUrl>#style0</styleUrl>\n')
-    xml.write('      </Pair>\n')
-    xml.write('    </StyleMap>\n')
-    xml.write('    <Style id="style">\n')
-    xml.write('      <LineStyle>\n')
-    xml.write('        <color>ff00ffff</color>\n')
-    xml.write('        <width>2.5</width>\n')
-    xml.write('      </LineStyle>\n')
-    xml.write('      <PolyStyle>\n')
-    xml.write('        <fill>0</fill>\n')
-    xml.write('        <color>ff00ffff</color>\n')
-    xml.write('      </PolyStyle>\n')
-    xml.write('    </Style>\n')
-    xml.write('    <Style id="style0">\n')
-    xml.write('      <LineStyle>\n')
-    xml.write('        <color>ff00ffff</color>\n')
-    xml.write('        <width>2.5</width>\n')
-    xml.write('      </LineStyle>\n')
-    xml.write('      <PolyStyle>\n')
-    xml.write('        <fill>0</fill>\n')
-    xml.write('        <color>ff00ffff</color>\n')
-    xml.write('      </PolyStyle>\n')
-    xml.write('    </Style>\n')
-    xml.write(f'    <Placemark id="{unit}">\n')
-    xml.write(f'      <name>{name}</name>\n')
-    xml.write('      <styleUrl>#stylemap_id1</styleUrl>\n')
-    xml.write('      <MultiGeometry>\n')
-    xml.write(f'        {boundary_coords}\n')
-    xml.write('      </MultiGeometry>\n')
-    xml.write('    </Placemark>\n')
-    xml.write('  </Document>\n')
-    xml.write('</kml>')
-    f.close()
+    data = {
+        'unit': unit,
+        'name': name,
+        'boundary_coords': boundary_coords,
+        'now': now,
+        'placemark_img': placemark_img
+    }
+    output = template.render(data)
+    with open(boundary_outfile,'w') as file:
+        file.write(output)
 
-def make_flyto(unit,name,lat,long,head,flyto_range,tilt):
+def make_flyto(unit,name,lat,long,head,flyto_range,tilt,now,placemark_img):
+    template = env.get_template('nps-flyto-template.kml')
     flyto_outfile = (f'nps-{unit}-flyto.kml')
     flyto_outfile = os.path.join(flytos,flyto_outfile)
     print(f'Creating flyto kml file for {unit}')
-    xml = open(flyto_outfile, 'w')
-    xml.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-    xml.write(f'<!-- Generated {now} by make-unit.py -->\n')
-    xml.write('<kml xmlns="http://www.opengis.net/kml/2.2">\n')
-    xml.write('  <Document>\n')
-    xml.write(f'    <name>{name}</name>\n')
-    xml.write(f'  <StyleMap id="msn_nps-{unit}-placemark">\n')
-    xml.write('    <Pair>\n')
-    xml.write('      <key>normal</key>\n')
-    xml.write(f'      <styleUrl>#sn_nps-{unit}-placemark</styleUrl>\n')
-    xml.write('    </Pair>\n')
-    xml.write('    <Pair>\n')
-    xml.write('      <key>highlight</key>\n')
-    xml.write(f'      <styleUrl>#sh_nps-{unit}-placemark</styleUrl>\n')
-    xml.write('    </Pair>\n')
-    xml.write('  </StyleMap>\n')
-    xml.write(f'  <Style id="sh_nps-{unit}-placemark">\n')
-    xml.write('    <IconStyle>\n')
-    xml.write('      <scale>1.5</scale>\n')
-    xml.write('      <Icon>\n')
-    xml.write(f'        <href>{placemark_img}</href>\n')
-    xml.write('      </Icon>\n')
-    xml.write('      <hotSpot x="0.5" y="0.5" xunits="fraction" yunits="fraction"/>\n')
-    xml.write('    </IconStyle>\n')
-    xml.write('    <LabelStyle>\n')
-    xml.write('      <color>00ffffff</color>\n')
-    xml.write('    </LabelStyle>\n')
-    xml.write('    <ListStyle>\n')
-    xml.write('    </ListStyle>\n')
-    xml.write('  </Style>\n')
-    xml.write(f'  <Style id="sn_nps-{unit}-placemark">\n')
-    xml.write('    <IconStyle>\n')
-    xml.write('      <scale>2.5</scale>\n')
-    xml.write('      <Icon>\n')
-    xml.write(f'        <href>{placemark_img}</href>\n')
-    xml.write('      </Icon>\n')
-    xml.write(('      <hotSpot x="0.5" y="0.5" xunits="fraction" yunits="fraction"/>\n'))
-    xml.write('    </IconStyle>\n')
-    xml.write('  <LabelStyle>\n')
-    xml.write('    <color>00ffffff</color>\n')
-    xml.write('  </LabelStyle>\n')
-    xml.write('  <ListStyle>\n')
-    xml.write('  </ListStyle>\n')
-    xml.write('  </Style>\n')
-    xml.write('  <Placemark>\n')
-    xml.write(f'    <name>{name}</name>\n')
-    xml.write('    <LookAt>\n')
-    xml.write(f'      <latitude>{lat}</latitude>\n')
-    xml.write(f'      <longitude>{long}</longitude>\n')
-    xml.write('      <altitude>0</altitude>\n')
-    xml.write(f'      <heading>{head}</heading>\n')
-    xml.write(f'      <range>{flyto_range}</range>\n')
-    xml.write(f'      <tilt>{tilt}</tilt>\n')
-    xml.write('      <gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>\n')
-    xml.write('    </LookAt>\n')
-    xml.write(f'    <styleUrl>#msn_nps-{unit}-placemark</styleUrl>\n')
-    xml.write('    <Point>\n')
-    xml.write('      <extrude>1</extrude>\n')
-    xml.write('      <altitudeMode>relativeToGround</altitudeMode>\n')
-    xml.write('      <gx:drawOrder>1</gx:drawOrder>\n')
-    xml.write(f'      <coordinates>{long},{lat},250</coordinates>\n')
-    xml.write('    </Point>\n')
-    xml.write('  </Placemark>\n')
-    xml.write('    <NetworkLink>\n')
-    xml.write('      <name>Autoplay</name>\n')
-    xml.write('      <Link>\n')
-    xml.write(('        <href>http://localhost:8765/query.html?'
-            'query=playtour=5c78ee78-98ec-40e5-8dbc-5af90d435bc8</href>\n'))
-    xml.write('      </Link>\n')
-    xml.write('    </NetworkLink>\n')
-    xml.write('    <Tour xmlns="http://www.google.com/kml/ext/2.2">\n')
-    xml.write(('      <name xmlns="http://www.opengis.net/kml/2.2">'
-            '5c78ee78-98ec-40e5-8dbc-5af90d435bc8</name>\n'))
-    xml.write('      <Playlist>\n')
-    xml.write('        <FlyTo>\n')
-    xml.write('          <duration>14.0</duration>\n')
-    xml.write('          <flyToMode></flyToMode>\n')
-    xml.write('          <LookAt xmlns="http://www.opengis.net/kml/2.2">\n')
-    xml.write(f'            <latitude>{lat}</latitude>\n')
-    xml.write(f'            <longitude>{long}</longitude>\n')
-    xml.write('            <altitude>0</altitude>\n')
-    xml.write(f'            <heading>{head}</heading>\n')
-    xml.write(f'            <range>{flyto_range}</range>\n')
-    xml.write(f'            <tilt>{tilt}</tilt>\n')
-    xml.write('          </LookAt>\n')
-    xml.write('        </FlyTo>\n')
-    xml.write('      </Playlist>\n')
-    xml.write('    </Tour>\n')
-    xml.write('  </Document>\n')
-    xml.write('</kml>\n')
-    f.close()
+    data = {
+        'unit': unit,
+        'name': name,
+        'lat': lat,
+        'long': long,
+        'head': head,
+        'flyto_range': flyto_range,
+        'tilt': tilt,
+        'now': now,
+        'placemark_img': placemark_img
+    }
+    output = template.render(data)
+    with open(flyto_outfile,'w') as file:
+        file.write(output)
 
 if unit == 'all':
     unit_list_query = (('SELECT id FROM units ORDER BY id'))
